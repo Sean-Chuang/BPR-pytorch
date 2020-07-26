@@ -54,12 +54,15 @@ parser.add_argument("--out",
 	help="save model or not")
 parser.add_argument("--gpu", 
 	type=str,
-	default="0",  
+	default="",  
 	help="gpu card ID")
 args = parser.parse_args()
 
 os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
-cudnn.benchmark = True
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+if args.gpu != "":
+	cudnn.benchmark = True
+
 
 
 ############################## PREPARE DATASET ##########################
@@ -77,7 +80,7 @@ test_loader = data.DataLoader(test_dataset,
 
 ########################### CREATE MODEL #################################
 model = model.BPR(user_num, item_num, args.factor_num)
-model.cuda()
+model.to(device)
 
 optimizer = optim.SGD(
 			model.parameters(), lr=args.lr, weight_decay=args.lamda)
@@ -91,9 +94,9 @@ for epoch in range(args.epochs):
 	train_loader.dataset.ng_sample()
 
 	for user, item_i, item_j in train_loader:
-		user = user.cuda()
-		item_i = item_i.cuda()
-		item_j = item_j.cuda()
+		user = user.to(device)
+		item_i = item_i.to(device)
+		item_j = item_j.to(device)
 
 		model.zero_grad()
 		prediction_i, prediction_j = model(user, item_i, item_j)

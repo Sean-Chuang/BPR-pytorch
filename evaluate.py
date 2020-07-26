@@ -19,9 +19,9 @@ def metrics(model, test_loader, top_k):
 	HR, NDCG = [], []
 
 	for user, item_i, item_j in test_loader:
-		user = user.cuda()
-		item_i = item_i.cuda()
-		item_j = item_j.cuda() # not useful when testing
+		user = user.to(device)
+		item_i = item_i.to(device)
+		item_j = item_j.to(device) # not useful when testing
 
 		prediction_i, prediction_j = model(user, item_i, item_j)
 		_, indices = torch.topk(prediction_i, top_k)
