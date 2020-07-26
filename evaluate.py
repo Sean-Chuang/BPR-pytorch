@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 def hit(gt_item, pred_items):
 	if gt_item in pred_items:
